@@ -1,220 +1,187 @@
 
 #include <iostream>
 #include <vector>
-#include <unordered_set>
 #include <string>
 using namespace std;
 
-// ======================================
-// 1. ABSTRACTION
-// ======================================
-
-class User {
-protected:
+// Student Class
+class Student {
+public:
+    int rollNo;
     string name;
-    string email;
-
-public:
-    virtual void displayDetails() const = 0;
-
-    virtual ~User() {}
-};
-
-// ======================================
-// 2. INHERITANCE
-// Participant inherits User
-// ======================================
-
-class Participant : public User {
-private:
-    int id;
-    string eventName;
-
-public:
+    int age;
+    float marks;
 
     // Constructor
-    Participant(int i, string n, string e, string event) {
-        id = i;
+    Student(int r, string n, int a, float m) {
+        rollNo = r;
         name = n;
-        email = e;
-        eventName = event;
+        age = a;
+        marks = m;
     }
 
-    // Getter
-    int getID() const {
-        return id;
-    }
-
-    string getEmail() const {
-        return email;
-    }
-
-    // ==================================
-    // 3. POLYMORPHISM
-    // Function overriding
-    // ==================================
-
-    void displayDetails() const override {
-        cout << "\nRegistration ID: " << id;
+    // Display Student Details
+    void display() {
+        cout << "\nRoll No: " << rollNo;
         cout << "\nName: " << name;
-        cout << "\nEmail: " << email;
-        cout << "\nEvent: " << eventName << endl;
+        cout << "\nAge: " << age;
+        cout << "\nMarks: " << marks << endl;
     }
 };
 
-// ======================================
-// 4. ENCAPSULATION
-// ======================================
-
-class EventRegistration {
+// Student Management Class
+class StudentManagement {
 private:
-    vector<Participant> participants;
-
-    unordered_set<string> registeredEmails;
-
-    int nextID;
+    vector<Student> students;
 
 public:
 
-    // Constructor
-    EventRegistration() {
-        nextID = 1001;
-    }
+    // Add Student
+    void addStudent() {
+        int roll, age;
+        string name;
+        float marks;
 
-    // Register Participant
-    void registerParticipant() {
+        cout << "\nEnter Roll Number: ";
+        cin >> roll;
 
-        string name, email, eventName;
-
-        cout << "\nEnter Participant Name: ";
-        getline(cin, name);
-
-        cout << "Enter Email: ";
-        getline(cin, email);
-
-        // Duplicate email checking
-        if (registeredEmails.find(email)
-            != registeredEmails.end()) {
-
-            cout << "\nEmail Already Registered!\n";
-            return;
-        }
-
-        cout << "Enter Event Name: ";
-        getline(cin, eventName);
-
-        Participant p(nextID++, name, email, eventName);
-
-        participants.push_back(p);
-
-        registeredEmails.insert(email);
-
-        cout << "\nRegistration Successful!";
-        cout << "\nYour Registration ID: "
-             << p.getID() << endl;
-    }
-
-    // Display All Participants
-    void displayParticipants() {
-
-        if (participants.empty()) {
-            cout << "\nNo Registrations Found.\n";
-            return;
-        }
-
-        cout << "\n===== REGISTERED PARTICIPANTS =====\n";
-
-        for (const Participant& p : participants) {
-            p.displayDetails();
-        }
-    }
-
-    // Search Participant - Linear Search
-    void searchParticipant() {
-
-        int searchID;
-
-        cout << "\nEnter Registration ID: ";
-        cin >> searchID;
-        cin.ignore();
-
-        bool found = false;
-
-        for (const Participant& p : participants) {
-
-            if (p.getID() == searchID) {
-
-                cout << "\nParticipant Found!\n";
-
-                p.displayDetails();
-
-                found = true;
-                break;
+        // Check duplicate roll number
+        for (auto &s : students) {
+            if (s.rollNo == roll) {
+                cout << "Student already exists!\n";
+                return;
             }
         }
 
-        if (!found) {
-            cout << "\nParticipant Not Found!\n";
+        cin.ignore();
+
+        cout << "Enter Name: ";
+        getline(cin, name);
+
+        cout << "Enter Age: ";
+        cin >> age;
+
+        cout << "Enter Marks: ";
+        cin >> marks;
+
+        students.push_back(Student(roll, name, age, marks));
+
+        cout << "\nStudent Added Successfully!\n";
+    }
+
+    // Display All Students
+    void displayStudents() {
+        if (students.empty()) {
+            cout << "\nNo Student Records Found!\n";
+            return;
         }
+
+        for (auto &s : students) {
+            s.display();
+        }
+    }
+
+    // Search Student
+    void searchStudent() {
+        int roll;
+        cout << "\nEnter Roll Number to Search: ";
+        cin >> roll;
+
+        for (auto &s : students) {
+            if (s.rollNo == roll) {
+                cout << "\nStudent Found!\n";
+                s.display();
+                return;
+            }
+        }
+
+        cout << "\nStudent Not Found!\n";
+    }
+
+    // Update Student
+    void updateStudent() {
+        int roll;
+        cout << "\nEnter Roll Number to Update: ";
+        cin >> roll;
+
+        for (auto &s : students) {
+            if (s.rollNo == roll) {
+                cout << "Enter New Marks: ";
+                cin >> s.marks;
+
+                cout << "\nStudent Updated Successfully!\n";
+                return;
+            }
+        }
+
+        cout << "\nStudent Not Found!\n";
+    }
+
+    // Delete Student
+    void deleteStudent() {
+        int roll;
+        cout << "\nEnter Roll Number to Delete: ";
+        cin >> roll;
+
+        for (int i = 0; i < students.size(); i++) {
+            if (students[i].rollNo == roll) {
+                students.erase(students.begin() + i);
+                cout << "\nStudent Deleted Successfully!\n";
+                return;
+            }
+        }
+
+        cout << "\nStudent Not Found!\n";
     }
 };
 
-// ======================================
-// MAIN FUNCTION
-// ======================================
-
+// Main Function
 int main() {
-
-    EventRegistration system;
-
+    StudentManagement sm;
     int choice;
 
     do {
+        cout << "\n===== STUDENT MANAGEMENT SYSTEM =====";
+        cout << "\n1. Add Student";
+        cout << "\n2. Display Students";
+        cout << "\n3. Search Student";
+        cout << "\n4. Update Student";
+        cout << "\n5. Delete Student";
+        cout << "\n6. Exit";
 
-        cout << "\n========== EVENT REGISTRATION SYSTEM ==========\n";
-
-        cout << "1. Register Participant\n";
-        cout << "2. Display All Participants\n";
-        cout << "3. Search Participant\n";
-        cout << "0. Exit\n";
-
-        cout << "\nEnter Your Choice: ";
-
-        if (!(cin >> choice)) {
-
-            cout << "Invalid Input!\n";
-
-            cin.clear();
-            cin.ignore(10000, '\n');
-
-            continue;
-        }
-
-        cin.ignore();
+        cout << "\n\nEnter Your Choice: ";
+        cin >> choice;
 
         switch (choice) {
-
             case 1:
-                system.registerParticipant();
+                sm.addStudent();
                 break;
 
             case 2:
-                system.displayParticipants();
+                sm.displayStudents();
                 break;
 
             case 3:
-                system.searchParticipant();
+                sm.searchStudent();
                 break;
 
-            case 0:
-                cout << "\nThank You for Using the System!\n";
+            case 4:
+                sm.updateStudent();
+                break;
+
+            case 5:
+                sm.deleteStudent();
+                break;
+
+            case 6:
+                cout << "\nExiting Program...\n";
                 break;
 
             default:
-                cout << "\nInvalid Choice! Try Again.\n";
+                cout << "\nInvalid Choice!\n";
         }
 
-    } while (choice != 0);
+    } while (choice != 6);
 
     return 0;
 }
